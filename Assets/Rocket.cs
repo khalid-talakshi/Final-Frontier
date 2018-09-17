@@ -1,26 +1,32 @@
-﻿using UnityEngine;
+﻿//This script is the code for the rocket ship. It contains all movement and audio effects
+
+using UnityEngine;
 
 public class Rocket : MonoBehaviour {
 
-    Rigidbody rigidBody;
-    AudioSource audioSource;
+    [SerializeField] float rcsThrust = 100f;
+    [SerializeField] float mainThrust = 100f;
 
-	// Use this for initialization
+    Rigidbody rigidBody; //Provides physics to object
+    AudioSource audioSource; //Provides audio to object
+
 	void Start () {
+        //gets physical components 
         rigidBody = GetComponent<Rigidbody>();
         audioSource = GetComponent<AudioSource>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        ProcessInput();
+        Thrust();
+        Rotate();
 	}
 
-    private void ProcessInput()
+    private void Thrust()
     {
-        if(Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space))
         {
-            rigidBody.AddRelativeForce(Vector3.up);
+            rigidBody.AddRelativeForce(Vector3.up * mainThrust);
             if (!audioSource.isPlaying)
             {
                 audioSource.Play();
@@ -30,13 +36,24 @@ public class Rocket : MonoBehaviour {
         {
             audioSource.Stop();
         }
+    }
 
-        if (Input.GetKey(KeyCode.A))
+    private void Rotate()
+    {
+
+        rigidBody.freezeRotation = true;
+
+        float rotationThisFrame = rcsThrust * Time.deltaTime;
+
+        if (Input.GetKey(KeyCode.A)) //if A is pressed, rotate left (counter clockwise)
         {
-            transform.Rotate(Vector3.forward);
-        } else if (Input.GetKey(KeyCode.D))
-        {
-            transform.Rotate(-Vector3.forward);
+            transform.Rotate(Vector3.forward * rotationThisFrame);
         }
+        else if (Input.GetKey(KeyCode.D)) //if D is pressed, rotate right (clockwise)
+        {
+            transform.Rotate(-Vector3.forward * rotationThisFrame);
+        }
+
+        rigidBody.freezeRotation = false;
     }
 }
